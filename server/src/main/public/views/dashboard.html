@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li ng-class="sideMenu('overview')"><a href="/dashboard#overview">Overview</a></li>
+            <li ng-class="sideMenu('spark_cluster')"><a href="/dashboard#spark_cluster">Spark Clusters</a></li>
+            <li ng-class="sideMenu('analytics')"><a href="/dashboard#analytics">Analytics</a></li>
+            <li ng-class="sideMenu('export')"><a href="/dashboard#export">Export</a></li>
+        </ul>
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div ng-class="tagClass('overview')">
+            <h1 class="page-header">Applications</h1>
+            <h3>Add Application Info here</h3>
+
+            <h1 class="page-header">Contexts</h1>
+            <h3>Add Context Info here</h3>
+
+            <h1 class="page-header">Jobs</h1>
+            <h3>Add Job Info here</h3>
+
+        </div>
+
+        <div ng-class="tagClass('spark_cluster')">
+            <h1 class="page-header">Monitor Spark Cluster</h1>
+        </div>
+
+    </div>
+
+
+</div>

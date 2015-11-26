@@ -22,7 +22,7 @@ def excludeJackson(module: ModuleID): ModuleID =
 lazy val serverSettings = Seq(
   description := "the backend web server",
   libraryDependencies ++= Seq(
-//    play,
+    ngFileUpload,
     angularJS,
     bootstrap
   ),

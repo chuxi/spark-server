@@ -33,7 +33,11 @@ object ExtractionApp extends SparkJob {
   override def runJob(sc: SparkContext, jobConfig: Config): Any = {
     val sqlc = new SQLContext(sc)
     import sqlc.implicits._
-
+//    val df = sqlc.read.json("algolibs/src/main/resources/student.json")
+    val df = sqlc.read.json(getClass.getResource("/student.json").getPath)
+    df.printSchema()
+    df.show()
+    df.groupBy("gender").count().show()
   }
 
   /**

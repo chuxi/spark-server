@@ -119,15 +119,13 @@ class ContextManager @Inject() (jobDao: JobDAO) extends Actor {
         context.watch(contexts(name))
         contexts(name) ! PoisonPill
         resultActors.remove(name)
-        contexts.remove(name)
         sender ! ContextStopped
       } else {
         sender ! NoSuchContext
       }
 
-      // to be modified, stop means terminated???
     case Terminated(actorRef) =>
-      val name :String = actorRef.path.name
+      val name: String = actorRef.path.name
       logger.info("Actor terminated: " + name)
       contexts.remove(name)
   }

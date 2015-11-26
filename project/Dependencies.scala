@@ -45,6 +45,8 @@ object Dependencies {
   val bootstrapVersion  = "3.3.5"
   val angularJS         = "org.webjars"                   %   "angularjs"       % angularJSVersion
   val bootstrap         = "org.webjars"                   %   "bootstrap"       % bootstrapVersion
+  val uiGrid            = "org.webjars.bower"             %   "angular-ui-grid" % "3.0.7"
+  val ngFileUpload      = "org.webjars.bower"             %   "ng-file-upload"  % "10.0.2"
 
   /**
    * test dependency packages

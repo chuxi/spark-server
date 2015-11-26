@@ -1,0 +1,154 @@
+<div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li ng-class="sideMenu('overview')"><a href="/jobs#overview">Overview</a></li>
+            <li ng-class="sideMenu('submit_job')"><a href="/jobs#submit_job">Submit Job</a></li>
+            <li ng-class="sideMenu('analytics')"><a href="/jobs#analytics">Analytics</a></li>
+            <li ng-class="sideMenu('export')"><a href="/jobs#export">Export</a></li>
+        </ul>
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div ng-class="tagClass('overview')">
+            <h1 class="page-header">Job Information</h1>
+            <div class="row">
+                <label class="col-sm-2 col-md-2 job-label">Job ID</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.jobId">{{ job.jobId }}</p>
+                </div>
+                <label class="col-sm-2 col-md-2 job-label">Job Status</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.status">{{ job.status }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-sm-2 col-md-2 job-label">Context Name</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.contextName">{{ job.contextName }}</p>
+                </div>
+
+                <label class="col-sm-2 col-md-2 job-label">Class Path</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.classPath">{{ job.classPath }}</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-sm-2 col-md-2 job-label">Start Time</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.startTime">{{ job.startTime }}</p>
+                </div>
+
+                <label class="col-sm-2 col-md-2 job-label">Running Duration</label>
+                <div class="col-sm-4 col-md-4">
+                    <p ng-model="job.duration">{{ job.duration }} ms</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-sm-2 col-md-2 job-label">Config</label>
+                <div class="col-sm-9 col-md-9">
+                    <textarea class="form-control" rows="8" ng-model="job.config">{{ job.config }}</textarea>
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-sm-2 col-md-2 job-label">Job Result</label>
+                <div class="col-sm-9 col-md-9">
+                    <textarea class="form-control" rows="6" ng-model="job.result">{{ job.result }}</textarea>
+                </div>
+            </div>
+
+
+            <h2 class="sub-header">Jobs</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Job Id</th>
+                        <th>Class Path</th>
+                        <th>Context Name</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="row in tableRows | orderBy: 'startTime': true">
+                        <td>{{ $index + 1 }}</td>
+                        <td><a ng-click="showJobInfo(row)">{{ row.jobId }}</a></td>
+                        <td>{{ row.classPath }}</td>
+                        <td>{{ row.contextName }}</td>
+                        <td>{{ row.startTime | date:'medium' }}</td>
+                        <td>{{ row.duration }}</td>
+                        <td>{{ row.status }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-class="tagClass('submit_job')">
+            <h1 class="page-header">Submit Job</h1>
+            <div class="row">
+                <form name="form" class="col-sm-8 col-md-8 form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Application Name<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="appName" placeholder="Your Application name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Class Path<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="classPath" placeholder="Your Class to Execute" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Config<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <textarea id="job_textarea" class="form-control" rows="8" ng-model="configString"></textarea>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Context Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="contextOpt" placeholder="optional">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-4">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="syncOpt"> Synchronized
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-4">
+                            <button type="submit" class="btn btn-primary" ng-click="submitJob()">Upload</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <p class="bg-primary" ng-show="uploadResult">{{ uploadResult }}</p>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

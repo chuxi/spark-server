@@ -1,11 +1,13 @@
 package controllers
 
+import java.nio.file.Files
 import java.util.Date
 
 import akka.actor.ActorRef
 import akka.util.Timeout
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
+import models.AppInfo
 import org.apache.logging.log4j.LogManager
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -27,7 +29,7 @@ class JarController @Inject() (@Named("jar-actor") jarManager: ActorRef) extends
 
   def listJars() = Action.async {
     (jarManager ? ListJars).mapTo[collection.Map[String, Date]].map{ jarTimeMap =>
-      val stringTimeMap = jarTimeMap.map(m => (m._1, m._2.getTime.toString)).toMap
+      val stringTimeMap = jarTimeMap.map(m => AppInfo(m._1, m._2)).toList
       Ok(Json.toJson(stringTimeMap))
     } recover {
       case e: Exception => BadRequest(e.toString)

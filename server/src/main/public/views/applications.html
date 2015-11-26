@@ -1,0 +1,82 @@
+<div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li ng-class="sideMenu('overview')"><a href="/applications#overview">Overview</a></li>
+            <li ng-class="sideMenu('upload')"><a href="/applications#upload">Upload Application</a></li>
+            <li ng-class="sideMenu('analytics')"><a href="/applications#analytics">Analytics</a></li>
+            <li ng-class="sideMenu('export')"><a href="/applications#export">Export</a></li>
+        </ul>
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div ng-class="tagClass('overview')">
+            <h1 class="page-header">Applications</h1>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Application Name</th>
+                        <th>Uploaded Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="row in tableRows | orderBy: 'uploadedDate': true">
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ row.appName }}</td>
+                        <td>{{ row.uploadedDate | date:'medium' }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-class="tagClass('upload')">
+            <h1 class="page-header">Upload Application</h1>
+            <div class="row">
+                <form name="form" class="col-sm-6 col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">AppName</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="appName" placeholder="Input Application Jar Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <input type="file" ng-model="jarfile" name="jarfile" ngf-select  ngf-pattern="'.jar'">
+                            <p class="help-block">Please upload your application jar file.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <button type="submit" class="btn btn-default" ng-click="uploadJar()">Upload</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-2">
+                            <p class="bg-primary" ng-show="uploadResult">{{ uploadResult }}</p>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+        <div ng-class="tagClass('analytics')">
+            <h1 class="page-header">Analytics</h1>
+
+        </div>
+
+        <div ng-class="tagClass('export')">
+            <h1 class="page-header">Export</h1>
+
+        </div>
+
+    </div>
+
+
+</div>

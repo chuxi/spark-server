@@ -1,28 +1,32 @@
 # the only endpoint for angularjs
-GET     /                           controllers.Assets.at(path = "/public", file = "index.html")
+GET     /                           @controllers.Application.index(any = "none")
 
 # static assets
 GET     /assets/*file               controllers.Assets.at(path = "/public", file)
+
+# api, for the jars, jobs, contexts
 
 # route for jars
 # Routes for listing and uploading jars
 #   GET /jars              - lists all current jars
 #   POST /jars/<appName>   - upload a new jar file
-GET     /jars                       @controllers.JarController.listJars()
-POST    /jars/:appName              @controllers.JarController.postJar(appName)
+GET     /api/jars                       @controllers.JarController.listJars()
+POST    /api/jars/:appName              @controllers.JarController.postJar(appName)
 
 # route for contexts
 # Routes for listing, adding, and stopping contexts
 #   GET    /contexts               - lists all current contexts
 #   POST   /contexts/<contextName> - creates a new context
 #   DELETE /contexts/<contextName> - stops a context and all jobs running in it
-GET     /contexts                   @controllers.ContextController.listContexts()
-POST    /contexts/:contextName      @controllers.ContextController.createContext(contextName)
-DELETE  /contexts/:contextName      @controllers.ContextController.stopContext(contextName)
-
+GET     /api/contexts                   @controllers.ContextController.listContexts()
+POST    /api/contexts/:contextName      @controllers.ContextController.createContext(contextName)
+DELETE  /api/contexts/:contextName      @controllers.ContextController.stopContext(contextName)
 
 # route for jobs
-GET     /jobs                       @controllers.JobInfoController.listJobs(limit: Int ?= 50)
-GET     /jobs/:jobId                @controllers.JobInfoController.getJob(jobId)
-DELETE  /jobs/:jobId                @controllers.JobInfoController.cancelJob(jobId)
-POST    /jobs                       @controllers.JobInfoController.submitJob(appName, classPath, contextOpt: Option[String], syncOpt: Option[Boolean], timeoutOpt: Option[Int])
+GET     /api/jobs                       @controllers.JobInfoController.listJobs(limit: Int ?= 50)
+GET     /api/jobs/:jobId                @controllers.JobInfoController.getJob(jobId)
+DELETE  /api/jobs/:jobId                @controllers.JobInfoController.cancelJob(jobId)
+POST    /api/jobs                       @controllers.JobInfoController.submitJob()
+
+
+GET     /*any                       @controllers.Application.index(any)

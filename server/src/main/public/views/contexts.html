@@ -1,0 +1,80 @@
+<div class="row">
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li ng-class="sideMenu('overview')"><a href="/contexts#overview">Overview</a></li>
+            <li ng-class="sideMenu('new_context')"><a href="/contexts#new_context">New Context</a></li>
+            <li ng-class="sideMenu('analytics')"><a href="/contexts#analytics">Analytics</a></li>
+            <li ng-class="sideMenu('export')"><a href="/contexts#export">Export</a></li>
+        </ul>
+    </div>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div ng-class="tagClass('overview')">
+            <h1 class="page-header">Contexts</h1>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Context Name</th>
+                        <th>Stop</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="row in tableRows">
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ row }}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm">Running</button>
+                            <button class="btn btn-danger btn-sm" ng-click="stopContext(row)">Stop</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div ng-class="tagClass('new_context')">
+            <h1 class="page-header">New Context</h1>
+            <div class="row">
+                <form name="form" class="col-sm-6 col-md-6 form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Context Name<span class="text-danger">*</span></label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="ctxName" placeholder="Your new context name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">CPU Cores Number</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" ng-model="num_cpu_cores" placeholder="optional">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label">Memory Per Node</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="mem_per_node" placeholder="optional">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-8 col-sm-offset-4">
+                            <button type="submit" class="btn btn-primary" ng-click="createContext()">Upload</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div>
+                            <p class="bg-primary" ng-show="uploadResult">{{ uploadResult }}</p>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>

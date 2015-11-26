@@ -5,6 +5,7 @@ import akka.util.Timeout
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.config.{ConfigException, ConfigFactory, Config}
+import models.JobReport
 import org.apache.logging.log4j.LogManager
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -52,7 +53,7 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
     */
   def listJobs(limit: Int) = Action.async {
     (jobInfo ? GetJobStatuses(Some(limit))).mapTo[Seq[JobInfo]].map(infos =>
-      Ok(Json.toJson(infos.map(getJobReport)))
+      Ok(Json.toJson(infos.map(JobReport(_))))
     )
   }
 
@@ -65,7 +66,7 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
       case NoSuchJobId =>
         NotFound(s"No such job id $jobId")
       case info: JobInfo =>
-        Ok(Json.toJson(getJobReport(info)))
+        Ok(Json.toJson(JobReport(info)))
       case JobResult(_, result) =>
         Ok(Json.toJson(Map("jobid" -> jobId, "result" -> result.toString)))
     }
@@ -107,19 +108,22 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
     * return JSON result of { StatusKey -> "OK" | "ERROR", ResultKey -> "result"}, where "result" is
     *         either the job id, or a result
     */
-  def submitJob(appName: String, classPath: String,
-                contextOpt: Option[String], syncOpt: Option[Boolean],
-                timeoutOpt: Option[Int]) = Action.async(parse.tolerantText){ implicit request =>
-    val configString = request.body
-    logger.info(s"configString = $configString" )
+  import models.SubmitJobForm._
+  def submitJob() = Action.async(parse.form(submitJobForm)){ implicit request =>
+    val submitJobData = request.body
+    val appName = submitJobData.appName
+    val classPath = submitJobData.classPath
+    val contextOpt = submitJobData.contextOpt
+    logger.info(s"submitJobData = $submitJobData")
+
     try {
-      val async = !syncOpt.getOrElse(false)
-      val jobConfig = ConfigFactory.parseString(configString).withFallback(config).resolve()
-      val contextConfig = Try(jobConfig.getConfig("spark.context-settings")).getOrElse(ConfigFactory.empty())
-      logger.info("context config " + contextConfig.root().render())
+      val async = !submitJobData.syncOpt.getOrElse(false)
+      val jobConfig = ConfigFactory.parseString(submitJobData.config).withFallback(config.getConfig("spark")).resolve()
+      val contextConfig = Try(jobConfig.getConfig("context-settings")).getOrElse(ConfigFactory.empty())
+//      logger.info("context config " + contextConfig.root().render())
       val jobManager = getJobManagerForContext(contextOpt, contextConfig, classPath)
       val events = if (async) asyncEvents else syncEvents
-      val timeout = timeoutOpt.map(t => Timeout(t.seconds)).getOrElse(DefaultSyncTimeout)
+      val timeout = submitJobData.timeoutOpt.map(t => Timeout(t.seconds)).getOrElse(DefaultSyncTimeout)
       (jobManager.get ? StartJob(appName, classPath, jobConfig, events))(timeout).map {
         // from jobResultActor
         case JobResult(jobId, res) => Ok(Json.toJson(Map("jobid" -> jobId, "result" -> res.toString)))
@@ -180,21 +184,21 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
     }
   }
 
-  private def getJobReport(jobInfo: JobInfo): Map[String, String] = {
-    Map("jobId" -> jobInfo.jobId,
-      "startTime" -> jobInfo.startTime.toString,
-      "classPath" -> jobInfo.classPath,
-      "config" -> jobInfo.config.root().render(),
-      "context" -> (if (jobInfo.contextName.isEmpty) "<<ad-hoc>>" else jobInfo.contextName),
-      "duration" -> jobInfo.jobLengthMillis.map { ms => ms / 1000.0 + " secs" }
-        .getOrElse("Job not done yet")) ++
-      (jobInfo match {
-      case JobInfo(_, _, _, _, _, _, None, _) => Map(StatusKey -> "RUNNING")
-      case JobInfo(_, _, _, _, _, _, _, Some(ex)) => Map(StatusKey -> "ERROR",
-        ResultKey -> ex.toString)
-      case JobInfo(_, _, _, _, _, _, Some(e), None) => Map(StatusKey -> "FINISHED")
-    })
-  }
+//  private def getJobReport(jobInfo: JobInfo): Map[String, String] = {
+//    Map("jobId" -> jobInfo.jobId,
+//      "startTime" -> jobInfo.startTime.toString,
+//      "classPath" -> jobInfo.classPath,
+//      "config" -> jobInfo.config.root().render(),
+//      "context" -> (if (jobInfo.contextName.isEmpty) "<<ad-hoc>>" else jobInfo.contextName),
+//      "duration" -> jobInfo.jobLengthMillis.map { ms => ms / 1000.0 + " secs" }
+//        .getOrElse("Job not done yet")) ++
+//      (jobInfo match {
+//      case JobInfo(_, _, _, _, _, _, None, _) => Map(StatusKey -> "RUNNING")
+//      case JobInfo(_, _, _, _, _, _, _, Some(ex)) => Map(StatusKey -> "ERROR",
+//        ResultKey -> ex.toString)
+//      case JobInfo(_, _, _, _, _, _, Some(e), None) => Map(StatusKey -> "FINISHED")
+//    })
+//  }
 
 
 }

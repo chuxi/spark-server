@@ -1,0 +1,5 @@
+{"id": 1, "name": "joe1", "gender": "M", "scores": {"math": 89, "physics": 92, "chemistry": 81}}
+{"id": 2, "name": "joe2", "gender": "F", "scores": {"math": 81, "physics": 90, "chemistry": 88}}
+{"id": 3, "name": "joe3", "gender": "F", "scores": {"math": 82, "physics": 88, "chemistry": 88}}
+{"id": 4, "name": "joe4", "gender": "M", "scores": {"math": 83, "physics": 94, "chemistry": 83}}
+{"id": 5, "name": "joe5", "gender": "M", "scores": {"math": 86, "physics": 99, "chemistry": 85}}

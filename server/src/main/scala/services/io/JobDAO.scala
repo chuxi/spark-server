@@ -19,6 +19,7 @@ case class JobInfo(jobId: String, contextName: String,
                    endTime: Option[Date], error: Option[Throwable]) {
   def jobLengthMillis: Option[Long] = endTime.map { end => end.getTime - startTime.getTime }
 
+  def isFinished: Boolean = endTime.isDefined && error.isEmpty
   def isRunning: Boolean = endTime.isEmpty
   def isErroredOut: Boolean = endTime.isDefined && error.isDefined
 }

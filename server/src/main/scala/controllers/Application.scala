@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller}
 
 /**
   * Created by king on 15-11-15.
-  * for test
+  * for handling the index page and reroute for angularjs
   */
 @Singleton
 class Application @Inject()() extends Controller {
@@ -15,8 +15,7 @@ class Application @Inject()() extends Controller {
 
   logger.info("Application Controller is initialized.")
 
-  def index = Action {
-    logger.info("index page")
-    Ok("hello")
+  def index(any: String) = Action {
+    Ok(html.index())
   }
 }
