@@ -1,8 +1,8 @@
 # the only endpoint for angularjs
-GET     /                           @controllers.Application.index(any = "none")
+GET     /                               @controllers.Application.index(any = "none")
 
 # static assets
-GET     /assets/*file               controllers.Assets.at(path = "/public", file)
+GET     /assets/*file                   controllers.Assets.at(path = "/public", file)
 
 # api, for the jars, jobs, contexts
 
@@ -29,4 +29,4 @@ DELETE  /api/jobs/:jobId                @controllers.JobInfoController.cancelJob
 POST    /api/jobs                       @controllers.JobInfoController.submitJob()
 
 
-GET     /*any                       @controllers.Application.index(any)
+GET     /*any                           @controllers.Application.index(any)
