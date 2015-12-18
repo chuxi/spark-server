@@ -25,7 +25,8 @@ import scala.util.Try
 object DataSourceApp extends SparkJob with NamedRddSupport with Logging {
   override def runJob(sc: SparkContext, jobConfig: Config): Any = {
     // split the row by delimiter comma symbol.
-    val data: RDD[Array[String]] = sc.textFile(jobConfig.getString("source.file.url")).map(_.split(",").map(_.trim))
+    val data: RDD[Array[String]] = sc.textFile(jobConfig.getString("source.file.url"))
+      .map(_.split(",").map(_.trim))
     namedRdds.update(jobConfig.getString("sharedrdds"), data)
   }
 
