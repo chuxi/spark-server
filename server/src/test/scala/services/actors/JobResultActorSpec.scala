@@ -27,10 +27,6 @@ class JobResultActorSpec(_system: ActorSystem) extends TestKit(_system) with Imp
     actor ! PoisonPill
   }
 
-  override def afterAll(): Unit = {
-    TestKit.shutdownActorSystem(system)
-  }
-
   describe("JobResultActor") {
     it("should return error if non-existing jobs are asked") {
       actor ! GetJobResult("jobId")

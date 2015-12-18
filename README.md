@@ -16,7 +16,7 @@ git clone and sbt run......then view localhost:9000 ( so low style, I swear I wo
 
 the difference between spark-jobserver and this project.
 
-Tu Cao::
+Tu Cao to spark-jobserver::
 
 I do not think it is a good idea that run this project by submit it to spark cluster, which aims to avoid assembling the spark dependency into jar, and I guess as a surprising trick... However, it is up to the authors and I would like to keep the system standalone. Besides, the project folders structure is so terrible. Are you sure you want it or just show your sbt ability ( I am a sbt fresher...)
 

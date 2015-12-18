@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import akka.actor.Props
 import com.typesafe.config.ConfigFactory
 import services.InMemoryDAO
-import services.actors.JobManagerActorMessages._
+import services.actors.JobManagerActor._
 import services.protocals.CommonMessages._
 
 import scala.collection.mutable

@@ -3,9 +3,9 @@ package cn.edu.zju.king.jobserver.etl
 import java.nio.file.{Files, Paths}
 
 import cn.edu.zju.king.serverapi.{SparkJobValid, SparkJobInvalid, SparkJob, SparkJobValidation}
-import com.typesafe.config.Config
+import com.typesafe.config.{ConfigFactory, Config}
 import org.apache.logging.log4j.LogManager
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SQLContext
 
 import scala.util.Try
@@ -14,30 +14,48 @@ import scala.util.Try
   * Created by king on 15-11-19.
   */
 object ExtractionApp extends SparkJob {
-  private val logger = LogManager.getLogger(getClass)
-  // should be hdfs:// or file:// protocal file
-  private val datasourceString = "datasource"
-  // define the etl config
-  private val etlConfigString = "etlconfig"
-  // should be JsArray, define the fields to extract from the source
-  private val extractConfigString = "extract"
-  // should be JsArray, every element defines how to transform a field into another
-  private val transformConfigString = "transform"
-  // maybe a sql sentence
-  private val loadConfigString = "load"
+//  private val logger = LogManager.getLogger(getClass)
+  val configString =
+    """
+      | source {
+      |   type: "file"
+      |   file {
+      |     url: "hdfs:///sample.txt"
+      |   }
+      | }
+      |
+      | sharedrdds: "source"
+      |
+      | etl {
+      |   extract {
+      |     table: "temptable"
+      |     schema: "col1, col2, col3..."
+      |     sql: "select ... from temptable where ..."
+      |   }
+      |
+      |   transform {}
+      |
+      |   load {
+      |     type: "file"
+      |     url: "hdfs:///result.parquet"
+      |   }
+      | }
+      |
+    """.stripMargin
+
 
   def main(args: Array[String]) {
-
+    val conf = new SparkConf().setMaster("spark://192.168.1.11:7077").setAppName("DataLoad")
+//    conf.set("fs.defaultFS", "hdfs://192.168.1.11:9000")
+    val sc = new SparkContext(conf)
+    val config = ConfigFactory.parseString(configString)
+    runJob(sc, config)
   }
 
   override def runJob(sc: SparkContext, jobConfig: Config): Any = {
-    val sqlc = new SQLContext(sc)
-    import sqlc.implicits._
-//    val df = sqlc.read.json("algolibs/src/main/resources/student.json")
-    val df = sqlc.read.json(getClass.getResource("/student.json").getPath)
-    df.printSchema()
-    df.show()
-    df.groupBy("gender").count().show()
+//    val sqlc = new SQLContext(sc)
+    val data = sc.textFile("hdfs://192.168.1.11:9000/sample.txt", minPartitions = 4)
+    data.collect().foreach(println)
   }
 
   /**
@@ -46,18 +64,6 @@ object ExtractionApp extends SparkJob {
     * @return either SparkJobValid or SparkJobInvalid
     */
   override def validate(sc: SparkContext, config: Config): SparkJobValidation = {
-    // check datasourceStringList()
-    Try(config.getString(datasourceString))
-      .filter(s => s.startsWith("hdfs") || Files.exists(Paths.get(s)))
-      .map(m => SparkJobValid)
-      .getOrElse(SparkJobInvalid(s"data source not exists"))
-
-    // check etlconfig
-    Try(config.getConfig(etlConfigString)).map(
-      m => (m.getIntList(extractConfigString),
-        m.getObjectList(transformConfigString),
-        m.getObjectList(loadConfigString))
-    ).map(x => SparkJobValid)
-      .getOrElse(SparkJobInvalid("etlconfig error"))
+    SparkJobValid
   }
 }

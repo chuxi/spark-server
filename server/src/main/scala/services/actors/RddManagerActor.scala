@@ -9,7 +9,7 @@ import scala.collection.mutable
 /**
   * Created by king on 15-11-17.
   */
-object RddManagerActorMessages {
+object RddManagerActor {
   // Message which asks to retrieve an RDD by name. If no such RDD is found, None will be returned.
   case class GetRddRequest(name: String)
 
@@ -28,7 +28,7 @@ object RddManagerActorMessages {
 }
 
 class RddManagerActor(sparkContext: SparkContext) extends Actor {
-  import RddManagerActorMessages._
+  import RddManagerActor._
   private val logger = LogManager.getLogger(getClass)
 
   private val namesToRDDs = new mutable.HashMap[String, RDD[_]]()

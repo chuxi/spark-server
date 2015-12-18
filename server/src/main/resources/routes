@@ -23,6 +23,11 @@ POST    /api/contexts/:contextName      @controllers.ContextController.createCon
 DELETE  /api/contexts/:contextName      @controllers.ContextController.stopContext(contextName)
 
 # route for jobs
+# Routes for listing, submitting, getting some job result and stopping some running job
+#   GET     /api/jobs               - list all jobs
+#   GET     /api/jobs/:jobId        - get the job result by jobId
+#   DELETE  /api/jobs/:jobId        - cancel a running job
+#   POST    /api/jobs               - start a job by offering appName, classPath and contextName
 GET     /api/jobs                       @controllers.JobInfoController.listJobs(limit: Int ?= 50)
 GET     /api/jobs/:jobId                @controllers.JobInfoController.getJob(jobId)
 DELETE  /api/jobs/:jobId                @controllers.JobInfoController.cancelJob(jobId)

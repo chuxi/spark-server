@@ -19,6 +19,7 @@ object Dependencies {
   val excludeMacros     = ExclusionRule(organization = "org.scalamacros")
   val excludeJacksonCore= ExclusionRule(organization = "com.fasterxml.jackson.core")
   val excludeDatabind   = ExclusionRule(organization = "com.fasterxml.jackson.databind")
+  val excludeAkkaConfig = ExclusionRule(organization = "com.typesafe")
 
   /**
     * spark
@@ -53,9 +54,10 @@ object Dependencies {
    */
   val scalaTestVersion  = "2.2.5"
   val akkaTestVersion   = "2.3.14"
+  // scalaTest is included in the playTest
   val scalaTest         = "org.scalatest"                 %%  "scalatest"       % scalaTestVersion  % "test"
   val akkaTest          = "com.typesafe.akka"             %%  "akka-testkit"    % akkaTestVersion   % "test"
-
+  val playTest          = "org.scalatestplus"             %%  "play"            % "1.4.0-M4"        % "test"
 
 
 }

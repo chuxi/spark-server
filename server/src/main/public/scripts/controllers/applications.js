@@ -20,9 +20,9 @@ angular.module('webApp')
         };
 
         $scope.upload = function(file) {
-            Upload.http({
+            Upload.upload({
                 url: '/api/jars/'.concat($scope.appName),
-                data: file
+                data: { jar: file }
             }).then(function(resp) {
                 $scope.uploadResult = 'Success ' + resp.config.data.name + ' uploaded.';
                 console.log('Success ' + resp.config.data.name + 'uploaded. Response: ' + resp.data);

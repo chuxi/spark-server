@@ -7,7 +7,7 @@ import com.google.inject.{Inject, Singleton}
 import com.typesafe.config.Config
 import org.apache.logging.log4j.LogManager
 import play.api.Configuration
-import services.actors.JobManagerActorMessages._
+import services.actors.JobManagerActor._
 import services.actors.{JobManagerActor, JobResultActor}
 import services.io.JobDAO
 import services.util.SparkJobUtils
@@ -21,7 +21,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by king on 15-11-17.
   */
-object ContextManagerMessages {
+object ContextManager {
   // Messages/actions
   case object AddContextsFromConfig // Start up initial contexts
   case object ListContexts
@@ -42,7 +42,7 @@ object ContextManagerMessages {
 
 @Singleton
 class ContextManager @Inject() (jobDao: JobDAO) extends Actor {
-  import ContextManagerMessages._
+  import ContextManager._
   private val logger = LogManager.getLogger(getClass)
 
   val config = context.system.settings.config
@@ -56,6 +56,7 @@ class ContextManager @Inject() (jobDao: JobDAO) extends Actor {
   val globalResultActor = context.actorOf(Props[JobResultActor], "global-result-actor")
 
   override def receive: Receive = {
+    // not used
     case AddContextsFromConfig =>
       addContextsFromConfig(config)
 
@@ -76,6 +77,7 @@ class ContextManager @Inject() (jobDao: JobDAO) extends Actor {
         }
       }
 
+      // now I do not want to have AdHocContext, it leads to un-managed contexts
     case GetAdHocContext(classPath, contextConfig) =>
       logger.info("Creating SparkContext for adhoc jobs.")
       val originator = sender() // Sender is a mutable reference, must capture in immutable val
@@ -115,7 +117,7 @@ class ContextManager @Inject() (jobDao: JobDAO) extends Actor {
     case StopContext(name) =>
       if (contexts contains name) {
         logger.info(s"Shutting down context $name")
-
+        // watch for the Terminated Message
         context.watch(contexts(name))
         contexts(name) ! PoisonPill
         resultActors.remove(name)

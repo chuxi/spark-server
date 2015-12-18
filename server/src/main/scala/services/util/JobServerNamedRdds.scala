@@ -5,7 +5,7 @@ import akka.util.Timeout
 import cn.edu.zju.king.serverapi.NamedRdds
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
-import services.actors.RddManagerActorMessages._
+import services.actors.RddManagerActor._
 
 import scala.concurrent.Await
 

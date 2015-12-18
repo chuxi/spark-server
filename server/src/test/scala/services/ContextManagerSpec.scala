@@ -4,7 +4,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FunSpecLike, Matchers}
-import services.ContextManagerMessages._
+import services.ContextManager._
 import services.io.JobDAO
 
 import scala.concurrent.Await
@@ -22,9 +22,9 @@ object ContextManagerSpec {
         num-cpu-cores = 4           # Number of cores to allocate.  Required.
         memory-per-node = 512m      # Executor memory per node, -Xmx style eg 512m, 1G, etc.
       }
-      jobserver.job-result-cache-size = 100
-      jobserver.context-creation-timeout = 5 s
-      jobserver.yarn-context-creation-timeout = 40 s
+      server.job-result-cache-size = 100
+      server.context-creation-timeout = 5 s
+      server.yarn-context-creation-timeout = 40 s
       contexts {
         olap-demo {
           num-cpu-cores = 4

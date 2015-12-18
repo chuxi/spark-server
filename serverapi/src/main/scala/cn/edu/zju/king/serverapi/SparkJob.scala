@@ -39,7 +39,7 @@ trait SparkJobBase {
    * trying to start this job.
    * @return either SparkJobValid or SparkJobInvalid
    */
-  def validate(sc: C, config: Config): SparkJobValidation
+  def validate(sc: C, jobConfig: Config): SparkJobValidation
 }
 
 

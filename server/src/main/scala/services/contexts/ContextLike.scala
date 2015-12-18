@@ -1,5 +1,6 @@
-package cn.edu.zju.king.serverapi
+package services.contexts
 
+import cn.edu.zju.king.serverapi.{SparkJob, SparkJobBase}
 import org.apache.spark.SparkContext
 
 /**

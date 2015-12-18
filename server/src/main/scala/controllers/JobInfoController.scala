@@ -5,14 +5,14 @@ import akka.util.Timeout
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
 import com.typesafe.config.{ConfigException, ConfigFactory, Config}
-import models.JobReport
+import models.{SubmitJobForm, JobReport}
 import org.apache.logging.log4j.LogManager
 import play.api.Configuration
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import services.ContextManagerMessages.ContextInitError
-import services.JobInfoManagerMessages.{GetJobStatus, GetJobStatuses}
-import services.actors.JobManagerActorMessages.{JobLoadingError, StartJob, KillJob}
+import services.ContextManager.ContextInitError
+import services.JobInfoManager.{GetJobStatus, GetJobStatuses}
+import services.actors.JobManagerActor.{JobLoadingError, StartJob, KillJob}
 import services.io.JobInfo
 import services.protocals.CommonMessages._
 import services.util.SparkJobUtils
@@ -109,8 +109,18 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
     *         either the job id, or a result
     */
   import models.SubmitJobForm._
-  def submitJob() = Action.async(parse.form(submitJobForm)){ implicit request =>
-    val submitJobData = request.body
+  def submitJob() = Action.async { implicit request =>
+    var submitJobDataOpt: Option[SubmitJobForm] = None
+    submitJobForm.bindFromRequest().fold(
+      onErrors => {
+        BadRequest(s"Wrong Submit Parameters: $onErrors")
+      },
+      jobData => {
+        submitJobDataOpt = Some(jobData)
+      }
+    )
+
+    val submitJobData = submitJobDataOpt.get
     val appName = submitJobData.appName
     val classPath = submitJobData.classPath
     val contextOpt = submitJobData.contextOpt
@@ -126,7 +136,7 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
       val timeout = submitJobData.timeoutOpt.map(t => Timeout(t.seconds)).getOrElse(DefaultSyncTimeout)
       (jobManager.get ? StartJob(appName, classPath, jobConfig, events))(timeout).map {
         // from jobResultActor
-        case JobResult(jobId, res) => Ok(Json.toJson(Map("jobid" -> jobId, "result" -> res.toString)))
+        case JobResult(jobId, res) => Ok(Json.toJson(Map(StatusKey -> "FINISHED", "jobid" -> jobId, "result" -> res.toString)))
         // from jobStatusActor
         case JobErroredOut(jobId, _, ex) =>
           InternalServerError(Json.toJson(Map(StatusKey -> "ERROR", ResultKey -> s"job $jobId error out by $ex")))
@@ -169,7 +179,7 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
   private def getJobManagerForContext(context: Option[String],
                                       contextConfig: Config,
                                       classPath: String): Option[ActorRef] = {
-    import services.ContextManagerMessages._
+    import services.ContextManager._
     val msg =
       if (context.isDefined) {
         GetContext(context.get)
@@ -183,22 +193,5 @@ class JobInfoController @Inject() (@Named("jobinfo-actor") jobInfo: ActorRef,
       case ContextInitError(err)                      => throw new RuntimeException(err)
     }
   }
-
-//  private def getJobReport(jobInfo: JobInfo): Map[String, String] = {
-//    Map("jobId" -> jobInfo.jobId,
-//      "startTime" -> jobInfo.startTime.toString,
-//      "classPath" -> jobInfo.classPath,
-//      "config" -> jobInfo.config.root().render(),
-//      "context" -> (if (jobInfo.contextName.isEmpty) "<<ad-hoc>>" else jobInfo.contextName),
-//      "duration" -> jobInfo.jobLengthMillis.map { ms => ms / 1000.0 + " secs" }
-//        .getOrElse("Job not done yet")) ++
-//      (jobInfo match {
-//      case JobInfo(_, _, _, _, _, _, None, _) => Map(StatusKey -> "RUNNING")
-//      case JobInfo(_, _, _, _, _, _, _, Some(ex)) => Map(StatusKey -> "ERROR",
-//        ResultKey -> ex.toString)
-//      case JobInfo(_, _, _, _, _, _, Some(e), None) => Map(StatusKey -> "FINISHED")
-//    })
-//  }
-
 
 }

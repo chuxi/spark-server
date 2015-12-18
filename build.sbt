@@ -8,15 +8,16 @@ lazy val commonSettings = Seq(
     log4j2Api,
     log4j2Core,
     scalaTest,
+//    playTest,
     akkaTest,
     sparkSQL excludeAll(excludeNettyIO, excludeMacros)
   ),
-  resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
+//  resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
   updateOptions := updateOptions.value.withCachedResolution(true)
 )
 
 
-def excludeJackson(module: ModuleID): ModuleID =
+def excludeSomeModules(module: ModuleID): ModuleID =
   module.excludeAll(excludeDatabind, excludeJacksonCore)
 
 lazy val serverSettings = Seq(
@@ -27,7 +28,7 @@ lazy val serverSettings = Seq(
     bootstrap
   ),
   dependencyOverrides += "com.fasterxml.jackson.core" % "jackson-core" % "2.4.4",
-  libraryDependencies ~= (_.map(excludeJackson)),
+  libraryDependencies ~= (_.map(excludeSomeModules)),
   parallelExecution in Test := false
 )
 
@@ -44,9 +45,9 @@ lazy val algolibsSettings = Seq(
 
 lazy val server = Project(id = "server", base = file("server"))
   .dependsOn(serverapi)
-  .settings(commonSettings: _*)
   .enablePlugins(PlayScala)
   .disablePlugins(PlayLayoutPlugin)
+  .settings(commonSettings: _*)
   .settings(serverSettings: _*)
 
 

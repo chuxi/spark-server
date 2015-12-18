@@ -1,6 +1,6 @@
 package services.contexts
 
-import cn.edu.zju.king.serverapi.{ContextLike, SparkJobBase, SparkSqlJob}
+import cn.edu.zju.king.serverapi.{SparkJobBase, SparkSqlJob}
 import com.typesafe.config.Config
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
@@ -11,7 +11,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 class SQLContextFactory extends SparkContextFactory {
   type C = SQLContext with ContextLike
 
-  def makeContext(sparkConf: SparkConf, config: Config,  contextName: String): C = {
+  def makeContext(sparkConf: SparkConf): C = {
     new SQLContext(new SparkContext(sparkConf)) with ContextLike {
       def isValidJob(job: SparkJobBase): Boolean = job.isInstanceOf[SparkSqlJob]
       def stop() { this.sparkContext.stop() }

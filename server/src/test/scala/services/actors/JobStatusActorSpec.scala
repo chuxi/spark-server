@@ -39,6 +39,7 @@ class JobStatusActorSpec(_system: ActorSystem) extends TestKit(_system) with Imp
   }
 
   before {
+    dao = new InMemoryDAO
     actor = system.actorOf(Props(classOf[JobStatusActor], dao))
   }
 

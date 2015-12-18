@@ -13,7 +13,7 @@ class JobDaoModules(environment: Environment,
   private val logger = LogManager.getLogger(getClass)
 
   override def configure(): Unit = {
-    val daoClassName = configuration.getString("spark.jobserver.jobdao").get
+    val daoClassName = configuration.getString("spark.server.jobdao").get
     val daoClass: Class[_ <: JobDAO] = environment.classLoader.loadClass(daoClassName)
       .asSubclass(classOf[JobDAO])
     bind(classOf[JobDAO]).to(daoClass)

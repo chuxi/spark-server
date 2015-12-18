@@ -14,13 +14,14 @@ import play.api.mvc.{Action, Controller}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.duration._
 import akka.pattern.ask
+import services._
 
 /**
   * Created by king on 15-11-16.
   */
 @Singleton
 class JarController @Inject() (@Named("jar-actor") jarManager: ActorRef) extends Controller {
-  import services.JarManagerMessages._
+  import services.JarManager._
 
   implicit val timeout = Timeout(5.seconds)
   private val logger = LogManager.getLogger(getClass)
@@ -36,16 +37,21 @@ class JarController @Inject() (@Named("jar-actor") jarManager: ActorRef) extends
     }
   }
 
-  def postJar(appName: String) = Action.async(parse.raw) { implicit request =>
-    val jarBytes = request.body.asBytes().get
+  def postJar(appName: String) = Action.async { implicit request =>
+    val jarBytes = request.body.asMultipartFormData.map{ data =>
+      data.file("jar").map { jar =>
+        Files.readAllBytes(jar.ref.file.toPath)
+      }.get
+    }.get
+
+//    val jarBytes = request.body.asBytes().get
     val future = jarManager ? StoreJar(appName, jarBytes)
-    future.map{
+    future.map {
       case JarStored => Ok
       case InvalidJar => BadRequest("Jar is not of the right format")
     }.recover {
       case e: Exception => InternalServerError(e.toString)
     }
   }
-
 
 }

@@ -13,8 +13,8 @@ import scala.util.Try
 object SparkJobUtils {
   import collection.JavaConverters._
 
-  def configToSparkConf(config: Config, contextConfig: Config, contextName: String): SparkConf = {
-    val sparkMaster = SparkMasterProvider.fromConfig(config).getSparkMaster(config)
+  def configToSparkConf(sparkMaster: String, contextName: String, contextConfig: Config): SparkConf = {
+//    val sparkMaster = SparkMasterProvider.fromConfig(config).getSparkMaster(config)
 
     val conf = new SparkConf()
     conf.setMaster(sparkMaster).setAppName(contextName)
@@ -27,13 +27,13 @@ object SparkJobUtils {
       conf.set("spark.executor.memory", nodeMemStr)
     }
 
-    Try(config.getString("spark.home")).foreach { home => conf.setSparkHome(home) }
+//    Try(config.getString("spark.home")).foreach { home => conf.setSparkHome(home) }
 
     conf.set("spark.ui.port", "0")
 
-    if (sparkMaster == "yarn-client") {
-      conf.set("spark.broadcast.factory", config.getString("spark.jobserver.yarn-broadcast-factory"))
-    }
+//    if (sparkMaster == "yarn-client") {
+//      conf.set("spark.broadcast.factory", config.getString("spark.jobserver.yarn-broadcast-factory"))
+//    }
 
     for (e <- contextConfig.entrySet().asScala if e.getKey.startsWith("spark.")) {
       conf.set(e.getKey, e.getValue.unwrapped.toString)
@@ -53,15 +53,15 @@ object SparkJobUtils {
    */
   def getMaxRunningJobs(config: Config): Int = {
     val cpuCores = Runtime.getRuntime.availableProcessors
-    Try(config.getInt("spark.jobserver.max-jobs-per-context")).getOrElse(cpuCores)
+    Try(config.getInt("spark.server.max-jobs-per-context")).getOrElse(cpuCores)
   }
 
   def getContextTimeout(config: Config): Int = {
     config.getString("spark.master") match {
       case "yarn-client" =>
-        Try(config.getDuration("spark.yarn-context-creation-timeout", TimeUnit.MILLISECONDS).toInt / 1000).getOrElse(40)
+        Try(config.getDuration("spark.server.yarn-context-creation-timeout", TimeUnit.MILLISECONDS).toInt / 1000).getOrElse(40)
       case _  =>
-        Try(config.getDuration("spark.context-creation-timeout", TimeUnit.MILLISECONDS).toInt / 1000).getOrElse(15)
+        Try(config.getDuration("spark.server.context-creation-timeout", TimeUnit.MILLISECONDS).toInt / 1000).getOrElse(15)
     }
   }
 

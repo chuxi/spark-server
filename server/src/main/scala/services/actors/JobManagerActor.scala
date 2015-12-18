@@ -5,14 +5,14 @@ import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.{PoisonPill, Props, Actor, ActorRef}
-import cn.edu.zju.king.serverapi.{SparkJobValid, SparkJobInvalid, NamedRddSupport, ContextLike}
+import cn.edu.zju.king.serverapi.{SparkJobValid, SparkJobInvalid, NamedRddSupport}
 import com.typesafe.config.Config
 import java.util.concurrent.Executors._
 import org.apache.logging.log4j.LogManager
 import org.apache.spark.SparkEnv
-import services.ContextManagerMessages.StopContext
-import services.actors.JobManagerActorMessages._
-import services.contexts.SparkContextFactory
+import services.ContextManager.StopContext
+import services.actors.JobManagerActor._
+import services.contexts.{ContextLike, SparkContextFactory}
 import services.io.{JobInfo, JarInfo, JobDAO}
 import services.util._
 
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by king on 15-11-17.
   */
-object JobManagerActorMessages {
+object JobManagerActor {
   case object Initialize
   case class StartJob(appName: String, classPath: String, config: Config, subscribedEvents: Set[Class[_]])
 
@@ -47,6 +47,7 @@ class JobManagerActor(dao: JobDAO, contextName: String,
   private val logger = LogManager.getLogger(getClass)
 
   val config = context.system.settings.config
+  val sparkMaster = config.getString("spark.master")
   private val maxRunningJobs = SparkJobUtils.getMaxRunningJobs(config)
   val executionContext = ExecutionContext.fromExecutorService(newFixedThreadPool(maxRunningJobs))
 
@@ -166,7 +167,7 @@ class JobManagerActor(dao: JobDAO, contextName: String,
                            rddManagerActor: ActorRef): Future[Any] = {
     val jobId = jobInfo.jobId
     val constructor = jobJarInfo.constructor
-    logger.info(s"Starting Spark job $jobId [${jobJarInfo.className}]...")
+    logger.info(s"Starting Spark job $jobId [${jobJarInfo.className}] ...")
 
     // Atomically increment the number of currently running jobs. If the old value already exceeded the
     // limit, decrement it back, send an error message to the sender, and return a dummy future with
@@ -234,7 +235,7 @@ class JobManagerActor(dao: JobDAO, contextName: String,
     val factoryClass = jarLoader.loadClass(factoryClassName)
     val factory = factoryClass.newInstance().asInstanceOf[SparkContextFactory]
     Thread.currentThread().setContextClassLoader(jarLoader)
-    factory.makeContext(config, contextConfig, contextName)
+    factory.makeContext(sparkMaster, contextName, contextConfig)
   }
 
   private def postEachJob(): Unit = {

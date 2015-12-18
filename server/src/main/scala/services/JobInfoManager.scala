@@ -5,9 +5,8 @@ import akka.util.Timeout
 import akka.pattern.ask
 import com.google.inject.name.Named
 import com.google.inject.{Inject, Singleton}
-import com.typesafe.config.Config
 import org.apache.logging.log4j.LogManager
-import services.ContextManagerMessages.GetResultActor
+import services.ContextManager.GetResultActor
 
 import services.io.JobDAO
 import scala.concurrent.Await
@@ -18,12 +17,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by king on 15-11-18.
   */
 
-object JobInfoManagerMessages {
+object JobInfoManager {
   // Requests
   case class GetJobStatuses(limit: Option[Int])
-  case class GetJobConfig(jobId: String)
+//  case class GetJobConfig(jobId: String)
   case class GetJobStatus(jobId: String)
-  case class StoreJobConfig(jobId: String, jobConfig: Config)
+//  case class StoreJobConfig(jobId: String, jobConfig: Config)
 
   // Responses
   case object JobConfigStored
@@ -31,7 +30,7 @@ object JobInfoManagerMessages {
 
 @Singleton
 class JobInfoManager @Inject() (jobDao: JobDAO, @Named("context-actor") contextManager: ActorRef) extends Actor {
-  import services.JobInfoManagerMessages._
+  import services.JobInfoManager._
   import services.protocals.CommonMessages._
   private val logger = LogManager.getLogger(getClass)
   implicit val ShortTimeout = Timeout(3.seconds)

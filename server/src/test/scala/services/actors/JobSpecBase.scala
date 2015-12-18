@@ -29,10 +29,10 @@ trait JobSpecConfig {
   def contextFactory = classOf[DefaultSparkContextFactory].getName
   lazy val config = {
     val ConfigMap = Map(
-      "spark.jobserver.job-result-cache-size" -> JobResultCacheSize,
+      "spark.server.job-result-cache-size" -> JobResultCacheSize,
       "num-cpu-cores" -> NumCpuCores,
       "memory-per-node" -> MemoryPerNode,
-      "spark.jobserver.max-jobs-per-context" -> MaxJobsPerContext,
+      "spark.server.max-jobs-per-context" -> MaxJobsPerContext,
       "akka.log-dead-letters" -> Integer.valueOf(0),
       "spark.master" -> "local[4]",
       "context-factory" -> contextFactory,

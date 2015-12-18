@@ -37,7 +37,7 @@
             <div class="row">
                 <label class="col-sm-2 col-md-2 job-label">Start Time</label>
                 <div class="col-sm-4 col-md-4">
-                    <p ng-model="job.startTime">{{ job.startTime }}</p>
+                    <p ng-model="job.startTime">{{ job.startTime | date:'medium' }}</p>
                 </div>
 
                 <label class="col-sm-2 col-md-2 job-label">Running Duration</label>

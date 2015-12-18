@@ -6,8 +6,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestKit}
 import com.typesafe.config.ConfigFactory
 import org.scalatest._
-import services.InMemoryDAO
-import services.JobInfoManagerMessages._
+import services.JobInfoManager._
 import services.io.{JarInfo, JobDAO, JobInfo}
 import services.protocals.CommonMessages.NoSuchJobId
 

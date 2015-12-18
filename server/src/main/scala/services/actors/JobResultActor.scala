@@ -13,7 +13,7 @@ class JobResultActor extends Actor {
   import services.protocals.CommonMessages._
   private val logger = LogManager.getLogger(getClass)
   private val config = context.system.settings.config
-  private val cache = new LRUCache[String, Any](config.getInt("spark.jobserver.job-result-cache-size"))
+  private val cache = new LRUCache[String, Any](config.getInt("spark.server.job-result-cache-size"))
   private val subscribers = mutable.HashMap.empty[String, ActorRef]
 
   override def receive: Receive = {

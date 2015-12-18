@@ -12,7 +12,7 @@ import services.util.JarUtils
 /**
   * Created by king on 15-11-16.
   */
-object JarManagerMessages {
+object JarManager {
   // Messages to JarManager actor
   /** Message for storing a JAR for an application given the byte array of the JAR file */
   case class StoreJar(appName: String, jarBytes: Array[Byte])
@@ -32,7 +32,7 @@ object JarManagerMessages {
 
 @Singleton
 class JarManager @Inject() (jobDao: JobDAO) extends Actor {
-  import JarManagerMessages._
+  import JarManager._
   private val logger = LogManager.getLogger(getClass)
 
   logger.info("Jar Manager Actor started successfully!")

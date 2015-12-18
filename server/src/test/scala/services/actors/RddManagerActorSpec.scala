@@ -19,6 +19,7 @@ with FunSpecLike with Matchers with BeforeAndAfter with BeforeAndAfterAll {
   System.setProperty("spark.cores.max", Runtime.getRuntime.availableProcessors.toString)
   System.setProperty("spark.executor.memory", "512m")
   System.setProperty("spark.akka.threads", Runtime.getRuntime.availableProcessors.toString)
+  System.setProperty("spark.driver.allowMultipleContexts", "true")
 
   // To avoid Akka rebinding to the same port, since it doesn't unbind immediately on shutdown
   System.clearProperty("spark.driver.port")

@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.logging.log4j.LogManager
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import services.ContextManagerMessages._
+import services.ContextManager._
 import scala.concurrent.duration._
 import akka.pattern.ask
 import scala.concurrent.ExecutionContext.Implicits.global
