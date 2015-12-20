@@ -40,7 +40,7 @@ class ServerETLSpec(_system: ActorSystem) extends ETLBaseSpec(_system) with Test
   var jobController: JobInfoController = _
 
   val appName: String = "test"
-  val contextName: String = "ctx1"
+  val contextName: String = "ServerETLSpec"
   val configString: String =
     """
       | source {
@@ -107,8 +107,8 @@ class ServerETLSpec(_system: ActorSystem) extends ETLBaseSpec(_system) with Test
     TestKit.shutdownActorSystem(system)
   }
 
-  describe("DataSourceApp") {
-    it("should get data") {
+  describe("Server ETL process") {
+    it("executes functions correctly") {
       var data = Map(
         "appName" -> appName,
         "contextOpt" -> contextName,
@@ -135,6 +135,5 @@ class ServerETLSpec(_system: ActorSystem) extends ETLBaseSpec(_system) with Test
 
     }
   }
-
 
 }

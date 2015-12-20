@@ -24,6 +24,7 @@ import scala.io.Source
 object GenData {
   val hdfs = "hdfs://192.168.1.11:9000"
   val fp = "hdfs:/etl/sample.txt"
+  val NUM = 20000
 
   def main(args: Array[String]) {
     val conf = new Configuration()
@@ -35,18 +36,22 @@ object GenData {
     // get a score between 60~100
     def randScore = math.round(math.random * 40 + 60)
 
-    val NUM = 2000
-    1 to NUM map{ i =>
-      s"${10000 + i}, ${"sub-" + i}, ${if (i%2 == 0) "female" else "male"}, $randAge, $randScore, $randScore, $randScore\n"
-    } foreach out.writeBytes
+    var t = 1
+    while (t < NUM) {
+      val start = t
+      t = t + 10000
+      start to t map{ i =>
+        s"${10000 + i}, ${"sub-" + i}, ${if (i%2 == 0) "female" else "male"}, $randAge, $randScore, $randScore, $randScore\n"
+      } foreach out.writeBytes
+      out.flush()
+    }
 
     out.close()
 
     val in = fs.open(file)
-//    val reader = new BufferedReader(new InputStreamReader(in))
-    val bs = Source.fromInputStream(in)
-    bs.getLines().foreach(println)
-    bs.close()
+    val br = Source.fromInputStream(in)
+    br.getLines().foreach(println)
+    br.close()
 
     fs.close()
   }
